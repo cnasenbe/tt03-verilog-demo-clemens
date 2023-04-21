@@ -13,11 +13,6 @@ module shift_reg #(
          out <= 0;
       else begin
          if (en)
-            case (dir)
-               0 :  out <= {out[MSB-2:0], d};
-               1 :  out <= {d, out[MSB-1:1]};
-            endcase
-         else
-            out <= out;
+            out <= {out[MSB-2:0], d};
       end
 endmodule
