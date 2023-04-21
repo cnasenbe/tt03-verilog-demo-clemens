@@ -19,6 +19,8 @@ async def test_shift_reg(dut):
 
     dut._log.info("check data output")
     
+    dut._log.info("check shift permanent data_in=1")
+    
     dut.data_in.value = 1
     await ClockCycles(dut.clk, 1)
     compare_val = 1;
@@ -29,3 +31,20 @@ async def test_shift_reg(dut):
         dut._log.info("check value after {} cycles, its {}, expect {}".format(i, dut.data_out.value, bin(compare_val)))
         assert bin(dut.data_out.value) == bin(compare_val)
         compare_val = compare_val << 1 | compare_val;
+    
+    dut.rst.value = 1
+    await ClockCycles(dut.clk, 10)
+    dut.rst.value = 0
+    
+    dut._log.info("check shift of only 1 cycle data_in=1")
+
+    dut.data_in.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.data_in.value = 0
+    compare_val = 1;
+    for i in range(8):
+        dut._log.info("check value after {} cycles".format(i))
+        await ClockCycles(dut.clk, 1)
+        dut._log.info("check value after {} cycles, its {}, expect {}".format(i, dut.data_out.value, bin(compare_val)))
+        assert bin(dut.data_out.value) == bin(compare_val)
+        compare_val = compare_val << 1;
