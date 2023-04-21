@@ -18,7 +18,7 @@ module clemensnasenberg_top  #(
         .d ( data_in ),
         .clk ( clk ),
         .en ( 1'b1 ),
-        .rstn ( !reset ),
+        .rst ( reset ),
         .out ( data_out )
     );
 
