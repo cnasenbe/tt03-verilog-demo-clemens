@@ -2,7 +2,8 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, FallingEdge, Timer, ClockCycles
 
-reg_width = 32
+reg_width = 96
+overhead_runs = 5
 
 @cocotb.test()
 async def test_shift_reg_perm_one(dut):
@@ -21,7 +22,7 @@ async def test_shift_reg_perm_one(dut):
     dut.data_in.value = 1
     await ClockCycles(dut.clk, 1)
     compare_val = 1 << reg_width-1;
-    for i in range(reg_width):
+    for i in range(reg_width + overhead_runs):
         dut._log.info("check value after {} cycles".format(i))
         await ClockCycles(dut.clk, 1)
         dut.data_in.value = 1
@@ -47,7 +48,7 @@ async def test_shift_reg_single_pulse(dut):
     await ClockCycles(dut.clk, 1)
     dut.data_in.value = 0
     compare_val = 1 << reg_width-1;
-    for i in range(reg_width):
+    for i in range(reg_width + overhead_runs):
         dut._log.info("check value after {} cycles".format(i))
         await ClockCycles(dut.clk, 1)
         dut._log.info("expect val: 0x{}".format(hex(compare_val)))

@@ -1,5 +1,5 @@
 module clemensnasenberg_top  #(
-    parameter MSB=32
+    parameter MSB=96
 ) (  
     input [7:0] io_in,
     output [7:0] io_out
