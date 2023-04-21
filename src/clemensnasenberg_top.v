@@ -7,11 +7,11 @@ module clemensnasenberg_top  #(
     wire clk = io_in[0];
     wire reset = io_in[1];
     wire data_in = io_in[2];
-    wire [31:0] data_out;
+    wire [MSB-1:0] data_out;
     assign io_out[7:0] = data_out[7:0];
 
     shift_reg #(
-        .MSB( 32 )
+        .MSB( MSB )
     )
     shift_reg_inst
     (
