@@ -12,6 +12,6 @@ module shift_reg #(
          out <= 0;
       else begin
          if (en)
-            out <= {out[MSB-2:0], d};
+            out <= {d, out[MSB-1:1]};
       end
 endmodule
