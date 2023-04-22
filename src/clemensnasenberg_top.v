@@ -1,25 +1,51 @@
 module clemensnasenberg_top  #(
-    parameter MSB=96
+    parameter WIDTH=24
 ) (  
     input [7:0] io_in,
     output [7:0] io_out
 );
-    wire clk = io_in[0];
+    wire sck = io_in[0];
     wire reset = io_in[1];
-    wire data_in = io_in[2];
-    wire [MSB-1:0] data_out;
-    assign io_out[7:0] = data_out[7:0];
+    wire ws = io_in[2];
+    wire sd1 = io_in[3];
+    wire sd2 = io_in[4];
+    wire sd_out;
+    assign io_out[7] = sd_out;
+    //Debug out for now
+    //assign io_out[7:0] = {7'b0,data[24]};
+    assign io_out[6:0] = {data[6],data[5],data[4],data[3],data[2],data[1],data[0]};
+    wire ws_rising_pulse;
 
-    shift_reg #(
-        .MSB( MSB )
-    )
-    shift_reg_inst
-    (
-        .d ( data_in ),
-        .clk ( clk ),
-        .en ( 1'b1 ),
-        .rst ( reset ),
-        .out ( data_out )
-    );
+    reg ws_edge;
+    reg carry;
+    reg [WIDTH:0] data; //width+1 because add overflow
+    reg [$clog2(WIDTH):0] count;
+    reg start;
+
+    always @ (negedge sck) begin
+        if (reset) begin
+            data <= 'b0;
+            count <= 0;
+            start <= 1'b0;
+            carry <= 1'b0;
+            ws_edge <= 1'b0;
+        end else begin
+            ws_edge <= ws;
+            if (ws_rising_pulse == 1'b1) begin
+                count <= 0;
+                carry <= 1'b0;
+                start <= 1'b1;
+            end
+            if (count == WIDTH-1) begin 
+                start <= 1'b0;
+            end
+            if (start == 1'b1) begin
+                {carry, data[count]} <= sd1 + sd2 + carry;
+                count = count + 1;
+            end
+        end
+    end
+    assign ws_rising_pulse = ws_edge ^ ws;
+    assign sd_out = count>0 ? data[count-1] : 1'b0;
 
 endmodule

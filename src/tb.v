@@ -8,10 +8,13 @@ that can be driven / tested by the cocotb test.py
 
 module tb (
     // testbench is controlled by test.py
-    input clk,
+    input sck,
     input rst,
-    input data_in,
-    output [7:0] data_out
+    input sd1,
+    input sd2,
+    input ws,
+    output [6:0] data_out,
+    output sd_out
    );
 
     // this part dumps the trace to a vcd file that can be viewed with GTKWave
@@ -22,9 +25,10 @@ module tb (
     end
 
     // wire up the inputs and outputs
-    wire [7:0] inputs = {5'b0, data_in, rst, clk};
+    wire [7:0] inputs = {3'b0, sd2, sd1, ws, rst, sck};
     wire [7:0] outputs;
-    assign data_out = outputs[7:0];
+    assign data_out = outputs[6:0];
+    assign sd_out = outputs[7];
 
     // instantiate the DUT
     clemensnasenberg_top clemensnasenberg_top_inst(

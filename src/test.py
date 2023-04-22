@@ -5,53 +5,48 @@ from cocotb.triggers import RisingEdge, FallingEdge, Timer, ClockCycles
 reg_width = 96
 overhead_runs = 5
 
+sample_width = 24
+input_samples = [[0xfffeff, 0x000100]]
+
+
 @cocotb.test()
 async def test_shift_reg_perm_one(dut):
     dut._log.info("start")
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.sck, 10, units="us")
     cocotb.start_soon(clock.start())
 
-    dut._log.info("reset")
-    dut.data_in.value = 0
-    dut.rst.value = 1
-    await ClockCycles(dut.clk, 10)
-    dut.rst.value = 0
-
-    dut._log.info("check shift permanent data_in=1")
-    
-    dut.data_in.value = 1
-    await ClockCycles(dut.clk, 1)
-    compare_val = 1 << reg_width-1;
-    for i in range(reg_width + overhead_runs):
-        dut._log.info("check value after {} cycles".format(i))
-        await ClockCycles(dut.clk, 1)
-        dut.data_in.value = 1
-        dut._log.info("expect val: 0x{}".format(hex(compare_val)))
-        dut._log.info("value: 0b{} expect: {}".format(dut.data_out.value, bin(compare_val & 0xFF)))
-        assert bin(dut.data_out.value) == bin(compare_val & 0xFF)
-        compare_val = compare_val >> 1 | compare_val;
-    
-@cocotb.test()
-async def test_shift_reg_single_pulse(dut):
-    dut._log.info("start")
-    clock = Clock(dut.clk, 10, units="us")
-    cocotb.start_soon(clock.start())
-
+    dut._log.info("init")
+    dut.ws.value = 0
+    dut.sd1.value = 0
+    dut.sd2.value = 0
     dut._log.info("reset")
     dut.rst.value = 1
-    await ClockCycles(dut.clk, 10)
+    await ClockCycles(dut.sck, 10)
     dut.rst.value = 0
-    
-    dut._log.info("check shift of only 1 cycle data_in=1")
 
-    dut.data_in.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.data_in.value = 0
-    compare_val = 1 << reg_width-1;
-    for i in range(reg_width + overhead_runs):
-        dut._log.info("check value after {} cycles".format(i))
-        await ClockCycles(dut.clk, 1)
-        dut._log.info("expect val: 0x{}".format(hex(compare_val)))
-        dut._log.info("value: 0b{} expect: {}".format(dut.data_out.value, bin(compare_val & 0xFF)))
-        assert bin(dut.data_out.value) == bin(compare_val & 0xFF)
-        compare_val = compare_val >> 1;
+    dut._log.info("Put some data in and change word line")
+    dut._log.info("{:X}".format(input_samples[0][0]))
+    dut._log.info("{:X}".format(input_samples[0][1]))
+    dut._log.info("{}".format(bin(input_samples[0][0])))
+    dut._log.info("{}".format(bin(input_samples[0][1])))
+    dut.ws.value = 1
+    value_out = 0x0
+    await ClockCycles(dut.sck, 1)
+    dut.sd1.value = (input_samples[0][0]) & 1
+    dut.sd2.value = (input_samples[0][1]) & 1
+    await ClockCycles(dut.sck, 1)
+    for i in range(sample_width):
+        dut.sd1.value = (input_samples[0][0] >> i) & 1
+        dut.sd2.value = (input_samples[0][1] >> i) & 1
+        await ClockCycles(dut.sck, 1)
+        dut._log.info("i:{}, sd_out value: 0b{}".format(i, dut.sd_out.value))
+        value_out = (dut.sd_out.value << i) | value_out
+    await ClockCycles(dut.sck, 1)
+    dut._log.info("i:{}, sd_out value: 0b{}".format(i, dut.sd_out.value))
+    value_out = (dut.sd_out.value << i) | value_out
+    dut._log.info("data_out value: 0x{:X}".format(value_out))
+    
+    ref_val = input_samples[0][0] + input_samples[0][1];
+    dut._log.info("ref value: 0x{:X}".format(ref_val))
+    
+    assert ref_val == value_out
