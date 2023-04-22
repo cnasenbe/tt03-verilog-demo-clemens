@@ -13,7 +13,7 @@ module clemensnasenberg_top  #(
     assign io_out[7] = sd_out;
     //Debug out for now
     //assign io_out[7:0] = {7'b0,data[24]};
-    assign io_out[6:0] = {data[24],cnt[2],start,carry,data[2],data[1],data[0]};
+    assign io_out[6:0] = {data[24],count[2],start,carry,data[2],data[1],data[0]};
     wire ws_rising_pulse;
 
     reg ws_edge;
