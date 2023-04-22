@@ -10,11 +10,12 @@ module tb (
     // testbench is controlled by test.py
     input sck,
     input rst,
-    input sd1,
-    input sd2,
+    input sd,
     input ws,
-    output [6:0] data_out,
-    output sd_out
+    output wsd,
+    output wsp,
+    output xor_data_left,
+    output xor_data_right
    );
 
     // this part dumps the trace to a vcd file that can be viewed with GTKWave
@@ -25,10 +26,12 @@ module tb (
     end
 
     // wire up the inputs and outputs
-    wire [7:0] inputs = {3'b0, sd2, sd1, ws, rst, sck};
+    wire [7:0] inputs = {4'b0, sd, ws, rst, sck};
     wire [7:0] outputs;
-    assign data_out = outputs[6:0];
-    assign sd_out = outputs[7];
+    assign wsd = outputs[3];
+    assign wsp = outputs[2];
+    assign xor_data_left = outputs[1];
+    assign xor_data_right = outputs[0];
 
     // instantiate the DUT
     clemensnasenberg_top clemensnasenberg_top_inst(

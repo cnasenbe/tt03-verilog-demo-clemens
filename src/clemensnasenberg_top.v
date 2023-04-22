@@ -1,5 +1,6 @@
 module clemensnasenberg_top  #(
-    parameter WIDTH=24
+    parameter WIDTH=24,
+    parameter CTRL_WIDTH=23
 ) (  
     input [7:0] io_in,
     output [7:0] io_out
@@ -7,45 +8,52 @@ module clemensnasenberg_top  #(
     wire sck = io_in[0];
     wire reset = io_in[1];
     wire ws = io_in[2];
-    wire sd1 = io_in[3];
-    wire sd2 = io_in[4];
-    wire sd_out;
-    assign io_out[7] = sd_out;
-    //Debug out for now
-    //assign io_out[7:0] = {7'b0,data[24]};
-    assign io_out[6:0] = {data[24],count[2],start,carry,data[2],data[1],data[0]};
-    wire ws_rising_pulse;
+    wire sd = io_in[3];
+    assign io_out[7:0] = {4'b0, wsd, wsp, xor_data_left, xor_data_right}; 
 
-    reg ws_edge;
-    reg carry;
-    reg [WIDTH:0] data; //width+1 because add overflow
-    reg [$clog2(WIDTH):0] count;
-    reg start;
+    wire xor_data_left;
+    wire xor_data_right;
 
-    always @ (negedge sck) begin
-        if (reset) begin
-            data <= 'b0;
-            count <= 0;
-            start <= 1'b0;
-            carry <= 1'b0;
-            ws_edge <= 1'b0;
+    reg wsd;
+    reg wsd_reg;
+    wire wsp;
+
+    reg [WIDTH-1:0] data_left;
+    reg [WIDTH-1:0] data_right;
+    reg [WIDTH-1:0] data;
+    reg [CTRL_WIDTH-1:0] control_reg;
+    integer i;
+
+    assign wsp = wsd ^ wsd_reg;
+    assign xor_data_left = ^data_left;
+    assign xor_data_right = ^data_right;
+
+    always @ (posedge sck) begin
+        if (wsp == 1'b1) begin
+            control_reg[CTRL_WIDTH-2:0] <= 'b0;
+            control_reg[CTRL_WIDTH-1] <= 1'b1;
+            data[WIDTH-2:0] <= 'b0;
+            data[WIDTH-1] <= sd;
         end else begin
-            ws_edge <= ws;
-            if (ws_rising_pulse == 1'b1) begin
-                count <= 0;
-                carry <= 1'b0;
-                start <= 1'b1;
+            control_reg[CTRL_WIDTH-1] <= 1'b0;
+            for (i = 1; i < CTRL_WIDTH; i = i+1) begin
+                control_reg[CTRL_WIDTH-1-i] <= control_reg[CTRL_WIDTH-i];
             end
-            if (count == WIDTH-1) begin 
-                start <= 1'b0;
-            end
-            if (start == 1'b1) begin
-                {carry, data[count]} <= sd1 + sd2 + carry;
-                count <= count + 1;
+            for (i = 0; i <= CTRL_WIDTH; i = i+1) begin
+                if (control_reg[CTRL_WIDTH-i] == 1'b1) begin        
+                    data[WIDTH-1-i] <= sd;
+                end
             end
         end
-    end
-    assign ws_rising_pulse = ws_edge ^ ws;
-    assign sd_out = count>0 ? data[count-1] : 1'b0;
-
+    
+        wsd <= ws;
+        wsd_reg <= wsd;
+        
+        if (!wsd & wsp) begin
+            data_left <= data;
+        end 
+        if (wsd & wsp) begin
+            data_right <= data;
+        end
+    end 
 endmodule
