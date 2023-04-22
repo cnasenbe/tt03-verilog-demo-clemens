@@ -7,7 +7,6 @@ project:
 # Source files must be in ./src and you must list each source file separately
   source_files:        
     - clemensnasenberg_top.v
-    - shift_reg.v
   top_module:  "clemensnasenberg_top"      # put the name of your top module here, make it unique by prepending your github username
 
 # Keep a track of the submission yaml
