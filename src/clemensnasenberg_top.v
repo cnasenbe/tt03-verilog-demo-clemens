@@ -13,7 +13,7 @@ module clemensnasenberg_top  #(
     assign io_out[7] = sd_out;
     //Debug out for now
     //assign io_out[7:0] = {7'b0,data[24]};
-    assign io_out[6:0] = {data[6],data[5],data[4],data[3],data[2],data[1],data[0]};
+    assign io_out[6:0] = {data[24],cnt[2],start,carry,data[2],data[1],data[0]};
     wire ws_rising_pulse;
 
     reg ws_edge;
@@ -41,7 +41,7 @@ module clemensnasenberg_top  #(
             end
             if (start == 1'b1) begin
                 {carry, data[count]} <= sd1 + sd2 + carry;
-                count = count + 1;
+                count <= count + 1;
             end
         end
     end
