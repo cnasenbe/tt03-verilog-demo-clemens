@@ -12,6 +12,7 @@ module tb (
     input rst,
     input sd,
     input ws,
+    output sd_out,
     output wsd,
     output wsp,
     output xor_data_left,
@@ -28,6 +29,7 @@ module tb (
     // wire up the inputs and outputs
     wire [7:0] inputs = {4'b0, sd, ws, rst, sck};
     wire [7:0] outputs;
+    assign sd_out = outputs[4];
     assign wsd = outputs[3];
     assign wsp = outputs[2];
     assign xor_data_left = outputs[1];

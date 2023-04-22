@@ -9,7 +9,8 @@ module clemensnasenberg_top  #(
     wire reset = io_in[1];
     wire ws = io_in[2];
     wire sd = io_in[3];
-    assign io_out[7:0] = {4'b0, wsd, wsp, xor_data_left, xor_data_right}; 
+    wire sd_out;
+    assign io_out[7:0] = {3'b0, sd_out, wsd, wsp, xor_data_left, xor_data_right}; 
 
     wire xor_data_left;
     wire xor_data_right;
@@ -55,5 +56,18 @@ module clemensnasenberg_top  #(
         if (wsd & wsp) begin
             data_right <= data;
         end
-    end 
+    end
+
+    wire [WIDTH-1:0] data_shift_in;
+    reg [WIDTH-1:0] data_shift;
+
+    assign data_shift_in = wsd ? data_right : data_left;
+    assign sd_out = data_shift[WIDTH-1];
+    always @ (negedge sck) begin
+        if (wsp == 1'b1) begin
+            data_shift <= data_shift_in;
+        end else begin
+            data_shift <= {data_shift[WIDTH-2:0], 1'b0};
+        end
+    end
 endmodule

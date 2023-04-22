@@ -30,12 +30,19 @@ async def test_i2s(dut):
         dut.ws.value = 1
         dut.sd.value = (samples[sample_id][LEFT] >> 24) & 1
         await ClockCycles(dut.sck, 1)
+        out_val = 0
         for i in range(sample_width):
             dut.sd.value = (samples[sample_id][LEFT] >> (23-i)) & 1
             await ClockCycles(dut.sck, 1)
+            if sample_id > 1:
+                out_val = out_val | dut.sd_out.value << sample_width-1-i
             if i == sample_width-1:
                 dut.ws.value = 0
         await ClockCycles(dut.sck, 1)
+        
+        if sample_id > 1:
+            dut._log.info("sd_out reconstructed right: {:X}".format(out_val))
+            assert hex(samples[sample_id-2][RIGHT]) == hex(out_val) 
 
         #Can only check last sample once new sample has been started
         if sample_id > 0:
@@ -45,10 +52,17 @@ async def test_i2s(dut):
             assert ref_xor_right == dut.xor_data_right.value
         
         dut.sd.value = (samples[sample_id][RIGHT] >> 24) & 1
+        out_val = 0
         for i in range(sample_width):
             dut.sd.value = (samples[sample_id][RIGHT] >> (23-i)) & 1
             await ClockCycles(dut.sck, 1)
+            if sample_id > 0:
+                out_val = out_val | dut.sd_out.value << sample_width-1-i
         await ClockCycles(dut.sck, 10)
+        
+        if sample_id > 0:
+            dut._log.info("sd_out reconstructed left: {:X}".format(out_val))
+            assert samples[sample_id-1][LEFT] == out_val 
 
         ref_xor_left = 0; 
         for k in range(sample_width):
