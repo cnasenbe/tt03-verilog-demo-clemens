@@ -61,7 +61,7 @@ module clemensnasenberg_top  #(
     reg [WIDTH-1:0] data_shift;
 
     assign sd_out = data_shift[WIDTH-1];
-    always @ (posedge !sck) begin
+    always @ (negedge sck) begin
         if (wsp == 1'b1) begin
             if (wsd == 1'b1) begin
                 data_shift <= data_right;
