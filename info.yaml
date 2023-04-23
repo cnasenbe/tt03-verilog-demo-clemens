@@ -18,12 +18,14 @@ yaml_version: 3.0
 # Here is a great example: https://github.com/davidsiaw/tt02-davidsiaw-stackcalc/blob/38c5647f83aad2aec675d566aa3d67b98f0aac81/info.yaml
 documentation: 
   author:       "Clemens Nasenberg"
-  title:        "I2S input, mix and output"
+  title:        "I2S reeceiver, data mix and transmitter"
   language:     "Verilog"
-  description:  "Read in 2 Channels of I2S streams, mix them according to input bits (mute, I2S input 1 or 2 or both) and send them out again."
+  description:  "Mix two I2S streams according to selection"
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
+        Read in 2 Channels of I2S streams, mix them according to input bits (mute, I2S input 1 or 2 or both) and send them out again.
+        For adding the LSB of the data is truncated.
         This should support standard I2S transmitter/receiver.
 
             https://www.sparkfun.com/datasheets/BreakoutBoards/I2SBUS.pdf
