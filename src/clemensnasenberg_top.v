@@ -10,6 +10,7 @@ module clemensnasenberg_top  #(
     wire ws = io_in[2];
     wire sd_c1 = io_in[3];
     wire sd_c2 = io_in[4];
+    wire [1:0] channel_sel = io_in[6:5];
     wire sd_out;
     assign io_out[7:0] = {3'b0, sd_out, wsd, wsp, xor_data_left, xor_data_right}; 
 
@@ -83,9 +84,14 @@ module clemensnasenberg_top  #(
     wire [WIDTH:0] add_left_channel;
     wire [WIDTH:0] add_right_channel;
 
-    assign add_right_channel = (data_right_c1 + data_right_c2); 
-    assign add_left_channel = (data_left_c1 + data_left_c2);
+    //                                                            (2'b11                        )   2'b10
+    //                                                            (2'b01                        )   2'b00
+    assign add_right_channel = channel_sel[1] ? (channel_sel[0] ? (data_right_c1 + data_right_c2) : data_right_c2) :
+                                                (channel_sel[0] ? (data_right_c1                ) : 33'b0)         ;
+    assign add_left_channel  = channel_sel[1] ? (channel_sel[0] ? (data_left_c1 + data_left_c2  ) : data_left_c2) :
+                                                (channel_sel[0] ? (data_left_c1                 ) : 33'b0)         ;
     assign sd_out = data_shift[WIDTH-1];
+
     always @ (negedge sck) begin
         if (reset == 1'b1) begin
             data_shift <= 'b0;

@@ -13,6 +13,7 @@ module tb (
     input sd_c1,
     input sd_c2,
     input ws,
+    input [1:0] channel_sel,
     output sd_out,
     output wsd,
     output wsp,
@@ -28,7 +29,7 @@ module tb (
     end
 
     // wire up the inputs and outputs
-    wire [7:0] inputs = {3'b0, sd_c2, sd_c1, ws, rst, sck};
+    wire [7:0] inputs = {1'b0, channel_sel, sd_c2, sd_c1, ws, rst, sck};
     wire [7:0] outputs;
     assign sd_out = outputs[4];
     assign wsd = outputs[3];
