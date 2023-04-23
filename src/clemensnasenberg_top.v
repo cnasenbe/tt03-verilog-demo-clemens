@@ -22,11 +22,9 @@ module clemensnasenberg_top  #(
     reg wsd_reg;
     wire wsp;
 
-    reg [WIDTH-1:0] data_left_c1;
-    reg [WIDTH-1:0] data_right_c1;
     reg [WIDTH-1:0] data_c1;
-    reg [WIDTH-1:0] data_left_c2;
-    reg [WIDTH-1:0] data_right_c2;
+    reg [WIDTH:0] data_left_add;
+    reg [WIDTH:0] data_right_add;
     reg [WIDTH-1:0] data_c2;
     reg [CTRL_WIDTH-1:0] control_reg;
     integer i;
@@ -39,11 +37,9 @@ module clemensnasenberg_top  #(
         if (reset == 1'b1) begin
             wsd <= 1'b0;
             wsd <= 1'b0;
-            data_left_c1 <= 'b0;
-            data_right_c1 <= 'b0;
             data_c1 <= 'b0;
-            data_left_c2 <= 'b0;
-            data_right_c2 <= 'b0;
+            data_right_add <= 'b0;
+            data_left_add <= 'b0;
             data_c2 <= 'b0;
             control_reg <= 'b0;
         end else begin
@@ -71,12 +67,36 @@ module clemensnasenberg_top  #(
             wsd_reg <= wsd;
 
             if (wsd & wsp) begin
-                data_left_c1 <= data_c1;
-                data_left_c2 <= data_c2;
+                case (channel_sel) 
+                    2'b00 : begin 
+                        data_left_add <= 33'b0;
+                    end
+                    2'b01 : begin 
+                        data_left_add <= data_c1;
+                    end
+                    2'b10 : begin 
+                        data_left_add <= data_c2;
+                    end
+                    2'b11 : begin 
+                        data_left_add <= data_c2 + data_c1;
+                    end
+                endcase
             end 
             if (!wsd & wsp) begin
-                data_right_c1 <= data_c1;
-                data_right_c2 <= data_c2;
+                case (channel_sel) 
+                    2'b00 : begin 
+                        data_right_add <= 33'b0;
+                    end
+                    2'b01 : begin 
+                        data_right_add <= data_c1;
+                    end
+                    2'b10 : begin 
+                        data_right_add <= data_c2;
+                    end
+                    2'b11 : begin 
+                        data_right_add <= data_c2 + data_c1;
+                    end
+                endcase
             end
         end
     end
@@ -85,12 +105,6 @@ module clemensnasenberg_top  #(
     wire [WIDTH:0] add_left_channel;
     wire [WIDTH:0] add_right_channel;
 
-    //                                                            (2'b11                        )   2'b10
-    //                                                            (2'b01                        )   2'b00
-    assign add_right_channel = channel_sel[1] ? (channel_sel[0] ? (data_right_c1 + data_right_c2) : data_right_c2) :
-                                                (channel_sel[0] ? (data_right_c1                ) : 33'b0)         ;
-    assign add_left_channel  = channel_sel[1] ? (channel_sel[0] ? (data_left_c1 + data_left_c2  ) : data_left_c2) :
-                                                (channel_sel[0] ? (data_left_c1                 ) : 33'b0)         ;
     assign sd_out = data_shift[WIDTH-1];
 
     always @ (negedge sck) begin
@@ -99,9 +113,9 @@ module clemensnasenberg_top  #(
         end else begin
             if (wsp == 1'b1) begin
                 if (wsd == 1'b1) begin
-                    data_shift <= add_right_channel >> 1;
+                    data_shift <= data_right_add >> 1;
                 end else begin
-                    data_shift <= add_left_channel >> 1;
+                    data_shift <= data_left_add >> 1;
                 end
             end else begin
                 data_shift <= {data_shift[WIDTH-2:0], 1'b0};
