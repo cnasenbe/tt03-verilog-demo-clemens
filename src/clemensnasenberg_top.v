@@ -58,14 +58,16 @@ module clemensnasenberg_top  #(
         end
     end
 
-    wire [WIDTH-1:0] data_shift_in;
     reg [WIDTH-1:0] data_shift;
 
-    assign data_shift_in = wsd ? data_right : data_left;
     assign sd_out = data_shift[WIDTH-1];
-    always @ (negedge sck) begin
+    always @ (posedge !sck) begin
         if (wsp == 1'b1) begin
-            data_shift <= data_shift_in;
+            if (wsd == 1'b1) begin
+                data_shift <= data_right;
+            end else begin
+                data_shift <= data_left;
+            end
         end else begin
             data_shift <= {data_shift[WIDTH-2:0], 1'b0};
         end
