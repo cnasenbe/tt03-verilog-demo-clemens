@@ -61,13 +61,6 @@ async def test_i2s_add(dut):
             added_value = (samples_c1[sample_id-1][LEFT] + samples_c2[sample_id-1][LEFT]) >> 1;
             assert hex(added_value) == hex(out_val) 
 
-        #Can only check last sample once new sample has been started
-        #if sample_id > 0:
-        #    ref_xor_right = 0; 
-        #    for k in range(sample_width):
-        #        ref_xor_right = ref_xor_right ^ ((samples_c1[sample_id-1][RIGHT] >> k) & 1)
-        #    assert ref_xor_right == dut.xor_data_right.value
-        
         dut.sd_c1.value = (samples_c1[sample_id][RIGHT] >> 24) & 1
         dut.sd_c2.value = (samples_c2[sample_id][RIGHT] >> 24) & 1
         out_val = 0
@@ -85,9 +78,6 @@ async def test_i2s_add(dut):
             assert hex(added_value) == hex(out_val) 
 
         ref_xor_left = 0; 
-        #for k in range(sample_width):
-        #    ref_xor_left = ref_xor_left ^ ((samples_c1[sample_id][LEFT] >> k) & 1)
-        #assert ref_xor_left == dut.xor_data_left.value
 
 @cocotb.test()
 async def test_i2s_only_channel1(dut):
@@ -133,13 +123,6 @@ async def test_i2s_only_channel1(dut):
             added_value = (samples_c1[sample_id-1][LEFT]) >> 1;
             assert hex(added_value) == hex(out_val) 
 
-        #Can only check last sample once new sample has been started
-        #if sample_id > 0:
-        #    ref_xor_right = 0; 
-        #    for k in range(sample_width):
-        #        ref_xor_right = ref_xor_right ^ ((samples_c1[sample_id-1][RIGHT] >> k) & 1)
-        #    assert ref_xor_right == dut.xor_data_right.value
-        
         dut.sd_c1.value = (samples_c1[sample_id][RIGHT] >> 24) & 1
         dut.sd_c2.value = (samples_c2[sample_id][RIGHT] >> 24) & 1
         out_val = 0
@@ -155,11 +138,6 @@ async def test_i2s_only_channel1(dut):
             dut._log.debug("sd_out reconstructed right: {:X}".format(out_val))
             added_value = (samples_c1[sample_id-1][RIGHT]) >> 1;
             assert hex(added_value) == hex(out_val) 
-
-        #ref_xor_left = 0; 
-        #for k in range(sample_width):
-        #    ref_xor_left = ref_xor_left ^ ((samples_c1[sample_id][LEFT] >> k) & 1)
-        #assert ref_xor_left == dut.xor_data_left.value
 
 @cocotb.test()
 async def test_i2s_only_channel2(dut):
@@ -205,13 +183,6 @@ async def test_i2s_only_channel2(dut):
             added_value = (samples_c2[sample_id-1][LEFT]) >> 1;
             assert hex(added_value) == hex(out_val) 
 
-        #Can only check last sample once new sample has been started
-        #if sample_id > 0:
-        #    ref_xor_right = 0; 
-        #    for k in range(sample_width):
-        #        ref_xor_right = ref_xor_right ^ ((samples_c1[sample_id-1][RIGHT] >> k) & 1)
-        #    assert ref_xor_right == dut.xor_data_right.value
-        
         dut.sd_c1.value = (samples_c1[sample_id][RIGHT] >> 24) & 1
         dut.sd_c2.value = (samples_c2[sample_id][RIGHT] >> 24) & 1
         out_val = 0
@@ -227,11 +198,6 @@ async def test_i2s_only_channel2(dut):
             dut._log.debug("sd_out reconstructed right: {:X}".format(out_val))
             added_value = (samples_c2[sample_id-1][RIGHT]) >> 1;
             assert hex(added_value) == hex(out_val) 
-
-        #ref_xor_left = 0; 
-        #for k in range(sample_width):
-        #    ref_xor_left = ref_xor_left ^ ((samples_c1[sample_id][LEFT] >> k) & 1)
-        #assert ref_xor_left == dut.xor_data_left.value
 
 @cocotb.test()
 async def test_i2s_mute(dut):
@@ -277,13 +243,6 @@ async def test_i2s_mute(dut):
             added_value = 0;
             assert hex(added_value) == hex(out_val) 
 
-        #Can only check last sample once new sample has been started
-        #if sample_id > 0:
-        #    ref_xor_right = 0; 
-        #    for k in range(sample_width):
-        #        ref_xor_right = ref_xor_right ^ ((samples_c1[sample_id-1][RIGHT] >> k) & 1)
-        #    assert ref_xor_right == dut.xor_data_right.value
-        
         dut.sd_c1.value = (samples_c1[sample_id][RIGHT] >> 24) & 1
         dut.sd_c2.value = (samples_c2[sample_id][RIGHT] >> 24) & 1
         out_val = 0
@@ -299,8 +258,3 @@ async def test_i2s_mute(dut):
             dut._log.debug("sd_out reconstructed right: {:X}".format(out_val))
             added_value = 0;
             assert hex(added_value) == hex(out_val) 
-
-        #ref_xor_left = 0; 
-        #for k in range(sample_width):
-        #    ref_xor_left = ref_xor_left ^ ((samples_c1[sample_id][LEFT] >> k) & 1)
-        #assert ref_xor_left == dut.xor_data_left.value

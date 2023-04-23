@@ -13,26 +13,21 @@ module clemensnasenberg_top  #(
     wire [1:0] channel_sel = io_in[6:5];
     wire sd_out;
     assign io_out[7:0] = {3'b0, sd_out, wsd, wsp, 2'b0}; 
-    //assign io_out[7:0] = {3'b0, sd_out, wsd, wsp, xor_data_left, xor_data_right}; 
-
-    //wire xor_data_left;
-    //wire xor_data_right;
 
     reg wsd;
     reg wsd_reg;
     wire wsp;
 
-    reg [WIDTH-1:0] data_c1;
     reg [WIDTH:0] data_left_add;
     reg [WIDTH:0] data_right_add;
+    reg [WIDTH-1:0] data_c1;
     reg [WIDTH-1:0] data_c2;
     reg [CTRL_WIDTH-1:0] control_reg;
     integer i;
 
     assign wsp = wsd ^ wsd_reg;
-    //assign xor_data_left = ^data_left_c1;
-    //assign xor_data_right = ^data_right_c1;
 
+    //I2S receiver of 2 Channels (2xLR) that adds the registered in data according to channel_sel
     always @ (posedge sck) begin
         if (reset == 1'b1) begin
             wsd <= 1'b0;
@@ -100,6 +95,8 @@ module clemensnasenberg_top  #(
             end
         end
     end
+
+    //I2S Transmitter of manipulated data
 
     reg [WIDTH-1:0] data_shift;
     wire [WIDTH:0] add_left_channel;
