@@ -10,7 +10,8 @@ module tb (
     // testbench is controlled by test.py
     input sck,
     input rst,
-    input sd,
+    input sd_c1,
+    input sd_c2,
     input ws,
     output sd_out,
     output wsd,
@@ -27,7 +28,7 @@ module tb (
     end
 
     // wire up the inputs and outputs
-    wire [7:0] inputs = {4'b0, sd, ws, rst, sck};
+    wire [7:0] inputs = {3'b0, sd_c2, sd_c1, ws, rst, sck};
     wire [7:0] outputs;
     assign sd_out = outputs[4];
     assign wsd = outputs[3];
