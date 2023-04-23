@@ -58,10 +58,10 @@ module clemensnasenberg_top  #(
             wsd <= ws;
             wsd_reg <= wsd;
             
-            if (!wsd & wsp) begin
+            if (wsd & wsp) begin
                 data_left <= data;
             end 
-            if (wsd & wsp) begin
+            if (!wsd & wsp) begin
                 data_right <= data;
             end
         end
