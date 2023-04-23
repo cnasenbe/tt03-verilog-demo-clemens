@@ -5,7 +5,6 @@ import math
 
 sample_width = 24
 samples = [[0xfffeff, 0xbecafe], [0x123456, 0xdeadbe], [0xf0f0f0, 0xf1f1f1], [0xfeefbe, 0xcafeca]]
-samples = []
 for gen in range(100):
     samples.append([round((math.sin(gen/10)+1)*0xffffff/2),round((math.sin(gen/10)+1)*0xffffff/2)])
 LEFT = 0
