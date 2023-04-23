@@ -12,10 +12,11 @@ module clemensnasenberg_top  #(
     wire sd_c2 = io_in[4];
     wire [1:0] channel_sel = io_in[6:5];
     wire sd_out;
-    assign io_out[7:0] = {3'b0, sd_out, wsd, wsp, xor_data_left, xor_data_right}; 
+    assign io_out[7:0] = {3'b0, sd_out, wsd, wsp, 2'b0}; 
+    //assign io_out[7:0] = {3'b0, sd_out, wsd, wsp, xor_data_left, xor_data_right}; 
 
-    wire xor_data_left;
-    wire xor_data_right;
+    //wire xor_data_left;
+    //wire xor_data_right;
 
     reg wsd;
     reg wsd_reg;
@@ -31,8 +32,8 @@ module clemensnasenberg_top  #(
     integer i;
 
     assign wsp = wsd ^ wsd_reg;
-    assign xor_data_left = ^data_left_c1;
-    assign xor_data_right = ^data_right_c1;
+    //assign xor_data_left = ^data_left_c1;
+    //assign xor_data_right = ^data_right_c1;
 
     always @ (posedge sck) begin
         if (reset == 1'b1) begin
