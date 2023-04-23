@@ -18,9 +18,9 @@ async def test_i2s(dut):
     dut.sd.value = 0
     dut._log.info("reset")
     dut.rst.value = 1
-    await ClockCycles(dut.sck, 5)
+    await ClockCycles(dut.sck, 5, rising=False)
     dut.rst.value = 0
-    await ClockCycles(dut.sck, 5)
+    await ClockCycles(dut.sck, 5, rising=False)
 
     for sample_id in range(len(samples)):
         dut._log.info("Shift data in with ws indicating new sample")
@@ -29,16 +29,16 @@ async def test_i2s(dut):
 
         dut.ws.value = 1
         dut.sd.value = (samples[sample_id][LEFT] >> 24) & 1
-        await ClockCycles(dut.sck, 1)
+        await ClockCycles(dut.sck, 1, rising=False)
         out_val = 0
         for i in range(sample_width):
             dut.sd.value = (samples[sample_id][LEFT] >> (23-i)) & 1
-            await ClockCycles(dut.sck, 1)
+            await ClockCycles(dut.sck, 1, rising=False)
             if sample_id > 1:
                 out_val = out_val | dut.sd_out.value << sample_width-1-i
             if i == sample_width-1:
                 dut.ws.value = 0
-        await ClockCycles(dut.sck, 1)
+        await ClockCycles(dut.sck, 1, rising=False)
         
         if sample_id > 1:
             dut._log.info("sd_out reconstructed right: {:X}".format(out_val))
@@ -55,10 +55,10 @@ async def test_i2s(dut):
         out_val = 0
         for i in range(sample_width):
             dut.sd.value = (samples[sample_id][RIGHT] >> (23-i)) & 1
-            await ClockCycles(dut.sck, 1)
+            await ClockCycles(dut.sck, 1, rising=False)
             if sample_id > 0:
                 out_val = out_val | dut.sd_out.value << sample_width-1-i
-        await ClockCycles(dut.sck, 10)
+        await ClockCycles(dut.sck, 10, rising=False)
         
         if sample_id > 0:
             dut._log.info("sd_out reconstructed left: {:X}".format(out_val))
